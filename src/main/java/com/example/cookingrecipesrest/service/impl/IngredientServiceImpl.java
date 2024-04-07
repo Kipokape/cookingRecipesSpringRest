@@ -5,6 +5,7 @@ import com.example.cookingrecipesrest.db.ConnectionManagerImpl;
 import com.example.cookingrecipesrest.model.Ingredient;
 import com.example.cookingrecipesrest.repository.IngredientRepository;
 import com.example.cookingrecipesrest.repository.impl.IngredientRepositoryImpl;
+import com.example.cookingrecipesrest.repository.impl.RecipeRepositoryImpl;
 import com.example.cookingrecipesrest.service.IngredientService;
 
 import java.util.List;
@@ -16,9 +17,14 @@ public class IngredientServiceImpl implements IngredientService {
     private final ConnectionManager connectionManager;
 
 
+
+
+
     public IngredientServiceImpl() {
         connectionManager = new ConnectionManagerImpl();
-        ingredientRepository = new IngredientRepositoryImpl(connectionManager);
+        ingredientRepository = new IngredientRepositoryImpl(
+                connectionManager,
+                new RecipeRepositoryImpl(connectionManager, null));
     }
 
     public IngredientServiceImpl(IngredientRepository ingredientRepository, ConnectionManager connectionManager) {

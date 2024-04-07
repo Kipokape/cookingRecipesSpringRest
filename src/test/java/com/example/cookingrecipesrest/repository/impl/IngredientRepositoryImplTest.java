@@ -45,12 +45,12 @@ class IngredientRepositoryImplTest {
                 postgres.getPassword()
         );
         categoryRepository = new CategoryRepositoryImpl(connectionProvider);
-        recipeRepository = new RecipeRepositoryImpl(connectionProvider);
-        repository = new IngredientRepositoryImpl(connectionProvider);
+        recipeRepository = new RecipeRepositoryImpl(connectionProvider, null);
+        repository = new IngredientRepositoryImpl(connectionProvider, recipeRepository);
         categoryRepository.save(new Category(0, "Первые блюда", null));
         categoryRepository.save(new Category(0, "Вторые блюда", null));
-        recipeRepository.save(new Recipe(0,1, "Щи", null));
-        recipeRepository.save(new Recipe(0,1, "Борщ", null));
+        recipeRepository.save(new Recipe(0, 1, "Щи", null));
+        recipeRepository.save(new Recipe(0, 1, "Борщ", null));
     }
 
     @AfterEach
@@ -65,14 +65,12 @@ class IngredientRepositoryImplTest {
     void findById_ExistingId_ReturnIngredient() {
         Ingredient expected;
         Ingredient actual;
-        List<RecipeIngredients> recipeIngredients = new ArrayList<>();
-        recipeIngredients.add(new RecipeIngredients(0, 1, 1, 100));
-        recipeIngredients.add(new RecipeIngredients(0, 2, 1, 200));
+        List<Recipe> recipes = new ArrayList<>();
+        recipes.add(new Recipe(1, 1, "Щи", null));
+        recipes.add(new Recipe(2, 1, "Борщ", null));
 
-        expected = repository.save(new Ingredient(0, "Картошка", recipeIngredients));
+        expected = repository.save(new Ingredient(0, "Картошка", recipes));
         actual = repository.findById(expected.getId());
-        System.out.println(expected);
-        System.out.println(actual);
         Assertions.assertEquals(expected, actual);
     }
 
@@ -84,19 +82,18 @@ class IngredientRepositoryImplTest {
     @Test
     void findAll_NotEmptyTable_ReturnIngredients() {
         List<Ingredient> ingredients;
-        List<RecipeIngredients> recipeIngredients = new ArrayList<>();
-        recipeIngredients.add(new RecipeIngredients(0, 1, 1, 100));
-        recipeIngredients.add(new RecipeIngredients(0, 2, 1, 200));
+        List<Recipe> recipes = new ArrayList<>();
+        recipes.add(new Recipe(2, 1, "Борщ", null));
+        recipes.add(new Recipe(1, 1, "Щи", null));
 
-        List<RecipeIngredients> recipeIngredientsSec = new ArrayList<>();
-        recipeIngredientsSec.add(new RecipeIngredients(0, 1, 2, 400));
-        recipeIngredientsSec.add(new RecipeIngredients(0, 2, 2, 300));
+        List<Recipe> recipesSec = new ArrayList<>();
+        recipesSec.add(new Recipe(2, 1, "Борщ", null));
+        recipesSec.add(new Recipe(1, 1, "Щи", null));
 
-        repository.save(new Ingredient(0,"Капуста", recipeIngredients));
-        repository.save(new Ingredient(0,"Картошка", recipeIngredientsSec));
+        repository.save(new Ingredient(0, "Капуста", recipes));
+        repository.save(new Ingredient(0, "Картошка", recipesSec));
         ingredients = repository.findALL();
 
-        System.out.println(ingredients);
         Assertions.assertEquals(2, ingredients.size());
     }
 
@@ -108,12 +105,30 @@ class IngredientRepositoryImplTest {
     }
 
     @Test
+    void getIngredientsByRecipe_ExistRecipe_ReturnIngredients() {
+        List<Recipe> recipes = new ArrayList<>();
+        recipes.add(new Recipe(1, 1, "Щи", null));
+        recipes.add(new Recipe(2, 1, "Борщ", null));
+
+
+        repository.save(new Ingredient(0, "Капуста", recipes));
+        repository.save(new Ingredient(0,"Картошка", recipes));
+        Assertions.assertEquals(2, repository.getIngredientsByRecipe(1L).size());
+    }
+
+    @Test
+    void getIngredientsByRecipe_NotExistRecipe_ReturnNone() {
+        Assertions.assertEquals(0, repository.getIngredientsByRecipe(11L).size());
+    }
+
+
+    @Test
     void deleteById_ExistingId_ReturnTrue() {
         Ingredient expected;
-        List<RecipeIngredients> recipeIngredients= new ArrayList<>();
-        recipeIngredients.add(new RecipeIngredients(0, 1, 1, 333));
-        recipeIngredients.add(new RecipeIngredients(0, 2, 1, 444));
-        expected = repository.save(new Ingredient(0, "Картошка", recipeIngredients));
+        List<Recipe> recipes = new ArrayList<>();
+        recipes.add(new Recipe(2, 1, "Борщ", null));
+        recipes.add(new Recipe(1, 1, "Щи", null));
+        expected = repository.save(new Ingredient(0, "Картошка", recipes));
         Assertions.assertTrue(repository.deleteById(expected.getId()));
     }
 
@@ -123,46 +138,41 @@ class IngredientRepositoryImplTest {
     }
 
 
-
     @Test
-    void save_NotExistRecipe_ReturnNewIngredient() {
+    void save_NotExistIngredient_ReturnNewIngredient() {
         Ingredient expected = new Ingredient(1, "Картошка", null);
 
-        List<RecipeIngredients> recipeIngredients = new ArrayList<>();
-        recipeIngredients.add(new RecipeIngredients(0, 1, 1, 100));
-        recipeIngredients.add(new RecipeIngredients(0, 2, 1, 200));
-        expected.setRecipeIngredients(recipeIngredients);
+        List<Recipe> recipes = new ArrayList<>();
+        recipes.add(new Recipe(2, 1, "Борщ", null));
+        recipes.add(new Recipe(1, 1, "Щи", null));
+        expected.setRecipes(recipes);
 
         Ingredient actual = new Ingredient();
         actual.setName(expected.getName());
-        actual.setRecipeIngredients(recipeIngredients);
+        actual.setRecipes(recipes);
         repository.save(actual);
 
         Assertions.assertEquals(expected, actual);
     }
 
     @Test
-    void save_ExistCategory_ReturnCategory() {
+    void save_ExistIngredient_ReturnIngredient() {
         Ingredient expected = new Ingredient(0, "Капуста", null);
 
-        List<RecipeIngredients> recipeIngredients = new ArrayList<>();
-        recipeIngredients.add(new RecipeIngredients(0, 1, 1, 100));
-        recipeIngredients.add(new RecipeIngredients(0, 2, 1, 200));
-        expected.setRecipeIngredients(recipeIngredients);
+        List<Recipe> recipes = new ArrayList<>();
+        recipes.add(new Recipe(2, 1, "Борщ", null));
+        recipes.add(new Recipe(1, 1, "Щи", null));
+        expected.setRecipes(recipes);
         repository.save(expected);
 
         Ingredient actual = new Ingredient();
         actual.setId(1);
         actual.setName(expected.getName());
-        actual.setRecipeIngredients(recipeIngredients);
+        actual.setRecipes(recipes);
         repository.save(actual);
 
         Assertions.assertEquals(expected, actual);
     }
-
-
-
-
 
 
 }

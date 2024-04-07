@@ -40,7 +40,6 @@ class CategoryRepositoryImplTest {
                 postgres.getPassword()
         );
         repository = new CategoryRepositoryImpl(connectionProvider);
-        ingredientRepository = new IngredientRepositoryImpl(connectionProvider);
 
     }
 

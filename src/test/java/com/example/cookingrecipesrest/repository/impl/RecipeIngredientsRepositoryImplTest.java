@@ -10,6 +10,7 @@ import com.example.cookingrecipesrest.repository.CategoryRepository;
 import com.example.cookingrecipesrest.repository.IngredientRepository;
 import com.example.cookingrecipesrest.repository.RecipeIngredientsRepository;
 import com.example.cookingrecipesrest.repository.RecipeRepository;
+import net.bytebuddy.utility.dispatcher.JavaDispatcher;
 import org.junit.jupiter.api.*;
 import org.testcontainers.containers.PostgreSQLContainer;
 
@@ -46,9 +47,9 @@ class RecipeIngredientsRepositoryImplTest {
                 postgres.getPassword()
         );
         categoryRepository = new CategoryRepositoryImpl(connectionProvider);
-        recipeRepository = new RecipeRepositoryImpl(connectionProvider);
+        recipeRepository = new RecipeRepositoryImpl(connectionProvider, null);
         repository = new RecipeIngredientsRepositoryImpl(connectionProvider);
-        ingredientRepository = new IngredientRepositoryImpl(connectionProvider);
+        ingredientRepository = new IngredientRepositoryImpl(connectionProvider, null);
         categoryRepository.save(new Category(0, "Первые блюда", null));
         categoryRepository.save(new Category(0, "Вторые блюда", null));
         recipeRepository.save(new Recipe(0,1, "Щи", null));

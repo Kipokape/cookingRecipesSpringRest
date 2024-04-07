@@ -2,9 +2,11 @@ package com.example.cookingrecipesrest.repository.impl;
 
 import com.example.cookingrecipesrest.db.ConnectionManager;
 import com.example.cookingrecipesrest.model.Ingredient;
+import com.example.cookingrecipesrest.model.Recipe;
 import com.example.cookingrecipesrest.model.RecipeIngredients;
 import com.example.cookingrecipesrest.repository.IngredientRepository;
 import com.example.cookingrecipesrest.repository.RecipeIngredientsRepository;
+import com.example.cookingrecipesrest.repository.RecipeRepository;
 import com.example.cookingrecipesrest.repository.mapper.IngredientResultSetMapper;
 import com.example.cookingrecipesrest.repository.mapper.impl.IngredientResultSetMapperImpl;
 
@@ -23,10 +25,13 @@ public class IngredientRepositoryImpl implements IngredientRepository {
 
     private final RecipeIngredientsRepository recipeIngredientsRepository;
 
-    public IngredientRepositoryImpl(ConnectionManager connectionManager) {
+    private final RecipeRepository recipeRepository;
+
+    public IngredientRepositoryImpl(ConnectionManager connectionManager, RecipeRepository recipeRepository) {
         this.connectionManager = connectionManager;
         createIngredientTableIfNotExists();
         recipeIngredientsRepository = new RecipeIngredientsRepositoryImpl(connectionManager);
+        this.recipeRepository = recipeRepository;
     }
 
     @Override
@@ -36,7 +41,7 @@ public class IngredientRepositoryImpl implements IngredientRepository {
             preparedStatement.setLong(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
             Ingredient ingredient = resultSetMapper.map(resultSet);
-            ingredient.setRecipeIngredients(recipeIngredientsRepository.getRecipeIngredientsByIngredient(ingredient.getId()));
+            ingredient.setRecipes(recipeRepository.getRecipesByIngredient(ingredient.getId()));
             return ingredient;
         } catch (SQLException | IOException e) {
             throw new RuntimeException("Невозможно найти ингредиент по ID.", e);
@@ -60,13 +65,25 @@ public class IngredientRepositoryImpl implements IngredientRepository {
     }
 
     @Override
+    public List<Ingredient> getIngredientsByRecipe(Long idRecipe) {
+        try (Connection connection = connectionManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(SQLIngredient.GET_BY_RECIPE.query)) {
+            preparedStatement.setLong(1, idRecipe);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            return resultSetMapper.mapList(resultSet);
+        } catch (SQLException | IOException e) {
+            throw new RuntimeException("Невозможно найти все ингредиенты по рецепту.",e);
+        }
+    }
+
+    @Override
     public List<Ingredient> findALL() {
         try (Connection connection = connectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(SQLIngredient.GET_ALL.query)) {
             ResultSet resultSet = preparedStatement.executeQuery();
             List<Ingredient> ingredients = resultSetMapper.mapList(resultSet);
             for (Ingredient ingredient : ingredients) {
-                ingredient.setRecipeIngredients(recipeIngredientsRepository.getRecipeIngredientsByRecipe(ingredient.getId()));
+                ingredient.setRecipes(recipeRepository.getRecipesByIngredient(ingredient.getId()));
             }
             return ingredients;
         } catch (SQLException | IOException e) {
@@ -88,10 +105,12 @@ public class IngredientRepositoryImpl implements IngredientRepository {
                 preparedStatement.setLong(2, ingredient.getId());
             }
             ResultSet resultSet = preparedStatement.executeQuery();
-            if (ingredient.getRecipeIngredients() != null && !ingredient.getRecipeIngredients().isEmpty()) {
-                ingredient.getRecipeIngredients().replaceAll(recipeIngredientsRepository::save);
-            }
             ingredient.setId(resultSetMapper.map(resultSet).getId());
+            if (ingredient.getRecipes() != null && !ingredient.getRecipes().isEmpty()) {
+                for (Recipe recipe: ingredient.getRecipes()) {
+                    recipeIngredientsRepository.save(new RecipeIngredients(recipe.getId(), ingredient.getId(), 0));
+                }
+            }
             return ingredient;
         } catch (SQLException | IOException e) {
             throw new RuntimeException("Невозможно сохранить/обновить ингредиент.", e);
@@ -119,8 +138,13 @@ public class IngredientRepositoryImpl implements IngredientRepository {
 
 
     enum SQLIngredient {
-        GET("SELECT * FROM ingredient WHERE id_ingredient = (?);"),
-        GET_ALL("SELECT * FROM ingredient;"),
+        GET("SELECT * FROM ingredient WHERE id_ingredient = (?) ORDER BY id_ingredient;"),
+        GET_ALL("SELECT * FROM ingredient ORDER BY id_ingredient;"),
+        GET_BY_RECIPE("SELECT i.id_ingredient, i.name_ingredient, ri.id_recipe " +
+                "FROM ingredient i " +
+                "LEFT JOIN recipe_ingredients ri ON i.id_ingredient = ri.id_ingredient  " +
+                "WHERE ri.id_recipe = (?) " +
+                "ORDER BY id_ingredient;"),
         INSERT("INSERT INTO ingredient(name_ingredient) VALUES ((?)) RETURNING *;"),
         DELETE("DELETE FROM ingredient WHERE id_ingredient = (?);"),
         UPDATE("UPDATE ingredient SET name_ingredient = (?) WHERE id_ingredient = (?) RETURNING *;"),

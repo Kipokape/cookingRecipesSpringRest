@@ -10,12 +10,12 @@ public class Ingredient {
 
     private String name;
 
-    private List<RecipeIngredients> recipeIngredients;
+    private List<Recipe> recipes;
 
-    public Ingredient(long id, String name, List<RecipeIngredients> recipeIngredients) {
+    public Ingredient(long id, String name, List<Recipe> recipes) {
         this.id = id;
         this.name = name;
-        this.recipeIngredients = recipeIngredients;
+        this.recipes = recipes;
     }
 
     public Ingredient() {
@@ -37,12 +37,12 @@ public class Ingredient {
         this.name = name;
     }
 
-    public List<RecipeIngredients> getRecipeIngredients() {
-        return recipeIngredients;
+    public List<Recipe> getRecipes() {
+        return recipes;
     }
 
-    public void setRecipeIngredients(List<RecipeIngredients> recipeIngredients) {
-        this.recipeIngredients = recipeIngredients;
+    public void setRecipes(List<Recipe> recipes) {
+        this.recipes = recipes;
     }
 
     @Override
@@ -50,7 +50,7 @@ public class Ingredient {
         return "Ingredient{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", recipeIngredients=" + recipeIngredients +
+                ", recipes=" + recipes +
                 '}';
     }
 
@@ -59,11 +59,11 @@ public class Ingredient {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Ingredient that = (Ingredient) o;
-        return id == that.id && name.equals(that.name) && Objects.equals(recipeIngredients, that.recipeIngredients);
+        return id == that.id && name.equals(that.name) && Objects.equals(recipes, that.recipes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, recipeIngredients);
+        return Objects.hash(id, name, recipes);
     }
 }

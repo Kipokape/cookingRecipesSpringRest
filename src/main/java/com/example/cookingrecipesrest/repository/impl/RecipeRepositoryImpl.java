@@ -1,8 +1,10 @@
 package com.example.cookingrecipesrest.repository.impl;
 
 import com.example.cookingrecipesrest.db.ConnectionManager;
+import com.example.cookingrecipesrest.model.Ingredient;
 import com.example.cookingrecipesrest.model.Recipe;
 import com.example.cookingrecipesrest.model.RecipeIngredients;
+import com.example.cookingrecipesrest.repository.IngredientRepository;
 import com.example.cookingrecipesrest.repository.RecipeIngredientsRepository;
 import com.example.cookingrecipesrest.repository.RecipeRepository;
 import com.example.cookingrecipesrest.repository.mapper.RecipeResultSetMapper;
@@ -23,10 +25,13 @@ public class RecipeRepositoryImpl implements RecipeRepository {
 
     private final RecipeIngredientsRepository recipeIngredientsRepository;
 
-    public RecipeRepositoryImpl(ConnectionManager connectionManager) {
+    private final IngredientRepository ingredientRepository;
+
+    public RecipeRepositoryImpl(ConnectionManager connectionManager, IngredientRepository ingredientRepository) {
         this.connectionManager = connectionManager;
         createRecipeTableIfNotExists();
         recipeIngredientsRepository = new RecipeIngredientsRepositoryImpl(connectionManager);
+        this.ingredientRepository = ingredientRepository;
     }
 
     @Override
@@ -35,8 +40,8 @@ public class RecipeRepositoryImpl implements RecipeRepository {
              PreparedStatement preparedStatement = connection.prepareStatement(SQLRecipe.GET.query)) {
             preparedStatement.setLong(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
-            Recipe recipe =resultSetMapper.map(resultSet);
-            recipe.setRecipeIngredients(recipeIngredientsRepository.getRecipeIngredientsByRecipe(recipe.getId()));
+            Recipe recipe = resultSetMapper.map(resultSet);
+            recipe.setIngredients(ingredientRepository.getIngredientsByRecipe(recipe.getId()));
             return recipe;
         } catch (SQLException | IOException e) {
             throw new RuntimeException("Невозможно найти рецепт по ID.", e);
@@ -51,7 +56,19 @@ public class RecipeRepositoryImpl implements RecipeRepository {
             ResultSet resultSet = preparedStatement.executeQuery();
             return resultSetMapper.mapList(resultSet);
         } catch (SQLException | IOException e) {
-            throw new RuntimeException("Невозможно найти все рецепты по категории.",e);
+            throw new RuntimeException("Невозможно найти все рецепты по категории.", e);
+        }
+    }
+
+    @Override
+    public List<Recipe> getRecipesByIngredient(Long idIngredient) {
+        try (Connection connection = connectionManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(SQLRecipe.GET_BY_INGREDIENT.query)) {
+            preparedStatement.setLong(1, idIngredient);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            return resultSetMapper.mapList(resultSet);
+        } catch (SQLException | IOException e) {
+            throw new RuntimeException("Невозможно найти все рецепты по ингредиенту.", e);
         }
     }
 
@@ -67,7 +84,7 @@ public class RecipeRepositoryImpl implements RecipeRepository {
             int res = preparedStatement.executeUpdate();
             return res != 0;
         } catch (SQLException | IOException e) {
-            throw new RuntimeException("Невозможно удалить рецепт по ID.",e);
+            throw new RuntimeException("Невозможно удалить рецепт по ID.", e);
         }
     }
 
@@ -78,7 +95,7 @@ public class RecipeRepositoryImpl implements RecipeRepository {
             ResultSet resultSet = preparedStatement.executeQuery();
             List<Recipe> recipes = resultSetMapper.mapList(resultSet);
             for (Recipe recipe : recipes) {
-                recipe.setRecipeIngredients(recipeIngredientsRepository.getRecipeIngredientsByRecipe(recipe.getId()));
+                recipe.setIngredients(ingredientRepository.getIngredientsByRecipe(recipe.getId()));
             }
             return recipes;
         } catch (SQLException | IOException e) {
@@ -97,20 +114,21 @@ public class RecipeRepositoryImpl implements RecipeRepository {
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setString(1, recipe.getName());
             preparedStatement.setLong(2, recipe.getIdCategory());
-            if(query.contains("UPDATE")){
+            if (query.contains("UPDATE")) {
                 preparedStatement.setLong(3, recipe.getId());
             }
             ResultSet resultSet = preparedStatement.executeQuery();
-            if(recipe.getRecipeIngredients() != null && !recipe.getRecipeIngredients().isEmpty()){
-                recipe.getRecipeIngredients().replaceAll(recipeIngredientsRepository::save);
-            }
             recipe.setId(resultSetMapper.map(resultSet).getId());
+            if (recipe.getIngredients() != null && !recipe.getIngredients().isEmpty()) {
+                for (Ingredient ingredient : recipe.getIngredients()) {
+                    recipeIngredientsRepository.save(new RecipeIngredients(recipe.getId(), ingredient.getId(), 0));
+                }
+            }
             return recipe;
         } catch (SQLException | IOException e) {
             throw new RuntimeException("Невозможно сохранить/обновить рецепт.", e);
         }
     }
-
 
 
     private void createRecipeTableIfNotExists() {
@@ -133,9 +151,15 @@ public class RecipeRepositoryImpl implements RecipeRepository {
     }
 
     enum SQLRecipe {
-        GET("SELECT * FROM recipe WHERE id_recipe = (?);"),
-        GET_BY_CATEGORY("SELECT * FROM recipe WHERE id_category = (?);"),
-        GET_ALL("SELECT * FROM recipe;"),
+        GET("SELECT * FROM recipe WHERE id_recipe = (?) ORDER BY id_recipe;"),
+        GET_BY_CATEGORY("SELECT * FROM recipe WHERE id_category = (?) ORDER BY id_recipe;"),
+
+        GET_BY_INGREDIENT("SELECT r.id_recipe, r.id_category, r.name_recipe, ri.id_ingredient " +
+                "FROM recipe r " +
+                "LEFT JOIN recipe_ingredients ri ON r.id_recipe = ri.id_recipe " +
+                "WHERE ri.id_ingredient = (?)" +
+                "ORDER BY id_recipe;"),
+        GET_ALL("SELECT * FROM recipe ORDER BY id_recipe;"),
         INSERT("INSERT INTO recipe(name_recipe, id_category) VALUES ((?), (?)) RETURNING *;"),
         DELETE("DELETE FROM recipe WHERE id_recipe = (?);"),
         UPDATE("UPDATE recipe SET name_recipe = (?), id_category = (?) WHERE id_recipe = (?) RETURNING *;"),

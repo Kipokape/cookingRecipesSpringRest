@@ -8,4 +8,6 @@ import java.util.List;
 public interface RecipeRepository extends SimpleRepository<Recipe, Long>{
 
     List<Recipe> getRecipesByCategory(Long idCategory);
+
+    List<Recipe> getRecipesByIngredient(Long idIngredient);
 }

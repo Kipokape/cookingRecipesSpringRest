@@ -27,7 +27,7 @@ public class CategoryRepositoryImpl implements CategoryRepository {
     public CategoryRepositoryImpl(ConnectionManager connectionManager) {
         this.connectionManager = connectionManager;
         createCategoryTableIfNotExists();
-        recipeRepository = new RecipeRepositoryImpl(connectionManager);
+        recipeRepository = new RecipeRepositoryImpl(connectionManager, null);
     }
 
     @Override
@@ -89,10 +89,13 @@ public class CategoryRepositoryImpl implements CategoryRepository {
                 preparedStatement.setLong(2, category.getId());
             }
             ResultSet resultSet = preparedStatement.executeQuery();
+            category.setId(resultSetMapper.map(resultSet).getId());
             if(category.getRecipes() != null && !category.getRecipes().isEmpty()){
+                for (Recipe recipe: category.getRecipes()) {
+                    recipe.setIdCategory(category.getId());
+                }
                 category.getRecipes().replaceAll(recipeRepository::save);
             }
-            category.setId(resultSetMapper.map(resultSet).getId());
             return category;
         } catch (SQLException | IOException e) {
             throw new RuntimeException("Невозможно сохранить/обновить категорию.", e);
@@ -120,8 +123,8 @@ public class CategoryRepositoryImpl implements CategoryRepository {
 
 
     enum SQLCategory {
-        GET("SELECT * FROM category WHERE id_category = (?);"),
-        GET_ALL("SELECT * FROM category;"),
+        GET("SELECT * FROM category WHERE id_category = (?) ORDER BY id_category;"),
+        GET_ALL("SELECT * FROM category ORDER BY id_category;"),
         INSERT("INSERT INTO category(name_category) VALUES ((?)) RETURNING *;"),
         DELETE("DELETE FROM category WHERE id_category = (?);"),
         UPDATE("UPDATE category SET name_category = (?) WHERE id_category = (?) RETURNING *;"),

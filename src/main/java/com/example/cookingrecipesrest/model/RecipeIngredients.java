@@ -19,6 +19,12 @@ public class RecipeIngredients {
         this.weight = weight;
     }
 
+    public RecipeIngredients(long recipeId, long ingredientId, int weight) {
+        this.recipeId = recipeId;
+        this.ingredientId = ingredientId;
+        this.weight = weight;
+    }
+
     public RecipeIngredients() {
     }
 

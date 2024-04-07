@@ -135,10 +135,10 @@ public class RecipeIngredientsRepositoryImpl implements RecipeIngredientsReposit
     }
 
     enum SQLRecipeIngredients {
-        GET("SELECT * FROM recipe_ingredients WHERE id_recipe_ingredients = (?);"),
-        GET_BY_RECIPE("SELECT * FROM recipe_ingredients WHERE id_recipe = (?);"),
-        GET_BY_INGREDIENT("SELECT * FROM recipe_ingredients WHERE id_ingredient = (?);"),
-        GET_ALL("SELECT * FROM recipe_ingredients;"),
+        GET("SELECT * FROM recipe_ingredients WHERE id_recipe_ingredients = (?) ORDER BY id_recipe_ingredients;"),
+        GET_BY_RECIPE("SELECT * FROM recipe_ingredients WHERE id_recipe = (?) ORDER BY id_recipe_ingredients;"),
+        GET_BY_INGREDIENT("SELECT * FROM recipe_ingredients WHERE id_ingredient = (?) ORDER BY id_recipe_ingredients;"),
+        GET_ALL("SELECT * FROM recipe_ingredients ORDER BY id_recipe_ingredients;"),
         INSERT("INSERT INTO recipe_ingredients(id_ingredient, id_recipe, weight) VALUES ((?),(?),(?)) RETURNING *;"),
         DELETE("DELETE FROM recipe_ingredients WHERE id_recipe_ingredients = (?);"),
         UPDATE("UPDATE recipe_ingredients " +

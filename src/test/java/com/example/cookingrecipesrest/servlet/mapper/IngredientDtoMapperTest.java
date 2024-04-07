@@ -16,7 +16,7 @@ class IngredientDtoMapperTest {
 
         Assertions.assertEquals(ingredient.getId(), dto.ingredientId());
         Assertions.assertEquals(ingredient.getName(), dto.name());
-        Assertions.assertEquals(ingredient.getRecipeIngredients(), dto.recipeIngredients());
+        Assertions.assertEquals(ingredient.getRecipes(), dto.recipes());
     }
 
     @Test
@@ -27,7 +27,7 @@ class IngredientDtoMapperTest {
 
         Assertions.assertEquals(ingredient.getId(), dto.ingredientId());
         Assertions.assertEquals(ingredient.getName(), dto.name());
-        Assertions.assertEquals(ingredient.getRecipeIngredients(), dto.recipeIngredients());
+        Assertions.assertEquals(ingredient.getRecipes(), dto.recipes());
     }
 
 }

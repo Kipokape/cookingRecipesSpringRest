@@ -4,6 +4,7 @@ import com.example.cookingrecipesrest.db.ConnectionManager;
 import com.example.cookingrecipesrest.db.ConnectionManagerImpl;
 import com.example.cookingrecipesrest.model.Recipe;
 import com.example.cookingrecipesrest.repository.RecipeRepository;
+import com.example.cookingrecipesrest.repository.impl.IngredientRepositoryImpl;
 import com.example.cookingrecipesrest.repository.impl.RecipeRepositoryImpl;
 import com.example.cookingrecipesrest.service.RecipeService;
 
@@ -18,7 +19,9 @@ public class RecipeServiceImpl implements RecipeService {
 
     public RecipeServiceImpl() {
         connectionManager = new ConnectionManagerImpl();
-        recipeRepository = new RecipeRepositoryImpl(connectionManager);
+        recipeRepository = new RecipeRepositoryImpl(
+                connectionManager,
+                new IngredientRepositoryImpl(connectionManager, null));
     }
 
     public RecipeServiceImpl(RecipeRepository recipeRepository, ConnectionManager connectionManager) {
