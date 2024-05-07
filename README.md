@@ -21,8 +21,8 @@ Recipe:
 
  - GET http://localhost:8088/api/recipe/{id} - Запрос для получения данных рецепта;
  - GET http://localhost:8088/api/recipe - Запрос для получения данных всех рецептов;
- - POST http://localhost:8088/api/recipe - Запрос для добавления нового рецепта (необходимо "categoryId", "name");
- - PATCH http://localhost:8088/api/recipe - Запрос для изменения рецепта (необходимо "recipeId", "categoryId", "name");
+ - POST http://localhost:8088/api/recipe - Запрос для добавления нового рецепта (необходимо "category(categoryId)", "name");
+ - PATCH http://localhost:8088/api/recipe - Запрос для изменения рецепта (необходимо "recipeId", "category(categoryId)", "name");
  - DELETE http://localhost:8088/api/recipe/{id} - Запрос для удаления рецепта;
 
 
@@ -39,6 +39,6 @@ RecipeIngredient:
 
  - GET http://localhost:8088/api/recipe-ingredient/{id} - Запрос для получения данных ингредиента рецепта;
  - GET http://localhost:8088/api/recipe-ingredient - Запрос для получения данных всех ингредиентов рецептов;
- - POST http://localhost:8088/api/recipe-ingredient - Запрос для добавления нового ингредиента рецепта (необходимо "recipeId", "ingredientId", "weight");
- - PATCH http://localhost:8088/api/recipe-ingredient - Запрос для изменения ингредиента рецепта (необходимо "recipeIngredientsId", "recipeId", "ingredientId", "weight");
+ - POST http://localhost:8088/api/recipe-ingredient - Запрос для добавления нового ингредиента рецепта (необходимо "recipe(recipeId)", "ingredient(ingredientId)", "weight");
+ - PATCH http://localhost:8088/api/recipe-ingredient - Запрос для изменения ингредиента рецепта (необходимо "recipeIngredientsId", "recipe(recipeId)", "ingredient(ingredientId)", "weight");
  - DELETE http://localhost:8088/api/recipe-ingredient/{id} - Запрос для удаления ингредиента рецепта;
