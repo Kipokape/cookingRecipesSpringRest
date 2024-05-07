@@ -37,7 +37,7 @@ TRUNCATE TABLE recipe_ingredients CASCADE;
 INSERT INTO category(id_category, name_category)
 VALUES (1, 'Первые блюда'),
        (2, 'Вторые блюда'),
-       (3, 'Дессерты');
+       (3, 'Десерты');
 
 INSERT INTO recipe(id_recipe, name_recipe, id_category)
 VALUES (1, 'Борщ', 1),
