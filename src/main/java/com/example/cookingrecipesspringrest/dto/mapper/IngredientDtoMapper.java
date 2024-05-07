@@ -16,7 +16,6 @@ public interface IngredientDtoMapper {
     IngredientDtoMapper INSTANCE = Mappers.getMapper(IngredientDtoMapper.class);
 
     @Named("toEntity")
-    //@Mapping(target = "id", source = "ingredientId")
     @Mapping(target = "recipes", qualifiedByName = {"RecipeDtoMapper", "toEntity"})
     @InheritInverseConfiguration(name = "toDto")
     Ingredient toEntity(IngredientDTO ingredientDTO);
@@ -39,7 +38,4 @@ public interface IngredientDtoMapper {
     @Mapping(target = "recipes", ignore = true)
     IngredientDTO toDtoWithoutRecipes(Ingredient ingredient);
 
-    @Named("toRecipesWithoutRecipesDto")
-    @InheritInverseConfiguration(name = "toDtoWithoutRecipes")
-    Ingredient toRecipesWithoutRecipesDto(IngredientDTO dto);
 }

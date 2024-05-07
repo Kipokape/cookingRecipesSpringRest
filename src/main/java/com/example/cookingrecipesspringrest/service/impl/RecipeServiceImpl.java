@@ -67,11 +67,11 @@ public class RecipeServiceImpl implements RecipeService {
 
     @Override
     public RecipeDTO findById(Long id) {
-        Optional<Recipe> optionalCategory = recipeRepository.findById(id);
+        Optional<Recipe> optionalRecipe = recipeRepository.findById(id);
 
         RecipeDTO recipeDTO;
-        if (optionalCategory.isPresent()) {
-            recipeDTO = recipeDtoMapper.toDto(optionalCategory.get());
+        if (optionalRecipe.isPresent()) {
+            recipeDTO = recipeDtoMapper.toDto(optionalRecipe.get());
         } else {
             throw new RepositoryException("Рецепта с таким id не существует: " + id);
         }

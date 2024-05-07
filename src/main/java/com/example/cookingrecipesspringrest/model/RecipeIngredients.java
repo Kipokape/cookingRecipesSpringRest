@@ -1,6 +1,7 @@
 package com.example.cookingrecipesspringrest.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.springframework.lang.NonNull;
@@ -10,6 +11,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "recipe_ingredients")
+@BatchSize(size = 10)
 public class RecipeIngredients {
 
     @Id

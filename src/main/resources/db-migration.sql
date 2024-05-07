@@ -34,39 +34,39 @@ TRUNCATE TABLE ingredient CASCADE;
 TRUNCATE TABLE recipe_ingredients CASCADE;
 
 
-INSERT INTO category(id_category, name_category)
-VALUES (1, 'Первые блюда'),
-       (2, 'Вторые блюда'),
-       (3, 'Десерты');
+INSERT INTO category(name_category)
+VALUES ('Первые блюда'),
+       ('Вторые блюда'),
+       ('Десерты');
 
-INSERT INTO recipe(id_recipe, name_recipe, id_category)
-VALUES (1, 'Борщ', 1),
-       (2, 'Щи', 1),
-       (3, 'Омлет', 2),
-       (4, 'Рагу', 2),
-       (5, 'Вафли', 3);
+INSERT INTO recipe(name_recipe, id_category)
+VALUES ('Борщ', 1),
+       ('Щи', 1),
+       ('Омлет', 2),
+       ('Рагу', 2),
+       ('Вафли', 3);
 
-INSERT INTO ingredient(id_ingredient, name_ingredient)
-VALUES (1, 'Капуста'),
-       (2, 'Картошка'),
-       (3, 'Вода'),
-       (4, 'Мука'),
-       (5, 'Яйца'),
-       (6, 'Мёд'),
-       (7, 'Свекла');
+INSERT INTO ingredient(name_ingredient)
+VALUES ('Капуста'),
+       ('Картошка'),
+       ('Вода'),
+       ('Мука'),
+       ('Яйца'),
+       ('Мёд'),
+       ('Свекла');
 
-INSERT INTO recipe_ingredients(id_recipe_ingredients, id_ingredient, id_recipe, weight)
-VALUES (1, 1, 1, 300),
-       (2, 2, 1, 100),
-       (3, 3, 1, 500),
-       (4, 4, 1, 200),
-       (5, 1, 2, 300),
-       (6, 2, 2, 100),
-       (7, 3, 2, 500),
-       (8, 5, 3, 500),
-       (9, 2, 4, 500),
-       (10, 3, 4, 100),
-       (11, 3, 5, 200),
-       (12, 4, 5, 300),
-       (13, 5, 5, 100);
+INSERT INTO recipe_ingredients(id_ingredient, id_recipe, weight)
+VALUES (1, 1, 300),
+       (2, 1, 100),
+       (3, 1, 500),
+       (4, 1, 200),
+       (1, 2, 300),
+       (2, 2, 100),
+       (3, 2, 500),
+       (5, 3, 500),
+       (2, 4, 500),
+       (3, 4, 100),
+       (3, 5, 200),
+       (4, 5, 300),
+       (5, 5, 100);
 

@@ -14,7 +14,6 @@ public interface CategoryDtoMapper {
     CategoryDtoMapper INSTANCE = Mappers.getMapper(CategoryDtoMapper.class);
 
     @Named("toEntity")
-//    @Mapping(target = "id", source = "categoryId")
     @Mapping(target = "recipes", qualifiedByName = {"RecipeDtoMapper", "toEntity"})
     @InheritInverseConfiguration(name = "toDto")
     Category toEntity(CategoryDTO dto);
