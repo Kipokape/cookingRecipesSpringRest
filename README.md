@@ -1,6 +1,6 @@
 REST-сервис на Spring Framework (Spring Core, Spring Context, Spring Bean, Spring Web MVC, Spring Data JPA (Hibernate)) для кулинарный рецептов. Дополнительно использовались HikariCP, Mapstruckt, Jackson. 
 Для тестов использовались Junit, Mockito, Spring Test , дополнительно для тестирования репозитория БД использовался testcontainers.
-Демонстрация работы: https://youtu.be/nDYmYAnfs3g
+Демонстрация работы: https://youtu.be/-ifMpSf-gLs
 
 Схема БД (PostgreSQL 15):
 
