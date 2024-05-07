@@ -1,4 +1,4 @@
-package com.example.cookingrecipesspringrest.advice;
+package com.example.cookingrecipesspringrest.exceptionhandler;
 
 import com.example.cookingrecipesspringrest.dto.ExceptionResponseDTO;
 import com.example.cookingrecipesspringrest.exception.RepositoryException;
@@ -12,7 +12,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 @RestControllerAdvice
-public class DefaultAdvice {
+public class RequestExceptionHandler {
 
     @ExceptionHandler(ServiceException.class)
     public ResponseEntity<ExceptionResponseDTO> handleServiceException(ServiceException e) {
