@@ -8,8 +8,15 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.NestedTestConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -21,6 +28,7 @@ import java.util.List;
 @SpringJUnitConfig
 @SpringJUnitWebConfig
 @ContextConfiguration(classes = SpringConfig.class)
+@TestPropertySource("classpath:test-db.properties")
 class CategoryDtoMapperTest {
 
     private final Category testCategory = new Category(1L, "первая", null);
@@ -38,7 +46,7 @@ class CategoryDtoMapperTest {
     }
 
     @Autowired
-    CategoryDtoMapper categoryDtoMapper;
+    CategoryDtoMapper categoryDtoMapper = new CategoryDtoMapperImpl();
 
     @Test
     void toDto_Category_ReturnCategoryDTO() {

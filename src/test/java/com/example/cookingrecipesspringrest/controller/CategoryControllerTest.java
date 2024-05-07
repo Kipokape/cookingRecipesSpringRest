@@ -14,6 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -29,6 +30,7 @@ import static org.mockito.Mockito.*;
 @SpringJUnitConfig
 @SpringJUnitWebConfig
 @ContextConfiguration(classes = SpringConfig.class)
+@TestPropertySource("classpath:test-db.properties")
 class CategoryControllerTest {
 
     @Mock
