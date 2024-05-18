@@ -12,7 +12,7 @@ pipeline {
   stages {
     stage('verify tooling') {
       steps {
-        bat '''
+        sh '''
           java -version
           ./bld version
         '''
@@ -20,32 +20,32 @@ pipeline {
     }
     stage('download') {
       steps {
-        bat './bld download purge'
+        sh './bld download purge'
       }
     }
     stage('compile') {
       steps {
-        bat './bld clean compile'
+        sh './bld clean compile'
       }
     }
     stage('precompile') {
       steps {
-        bat './bld precompile'
+        sh './bld precompile'
       }
     }
     stage('test') {
       steps {
-        bat './bld test'
+        sh './bld test'
       }
     }
     stage('war') {
       steps {
-        bat './bld war'
+        sh './bld war'
       }
     }  
     stage('copy the war file to the Tomcat server') {
       steps {
-        bat '''
+        sh '''
           ssh -i $TOMCAT_CREDS_USR@$TOMCAT_SERVER "/home/pi/tools/apache-tomcat-10.1.18/bin/catalina.bat stop"
           ssh -i $TOMCAT_CREDS_USR@$TOMCAT_SERVER "rm -rf $ROOT_WAR_LOCATION/ROOT; rm -f $ROOT_WAR_LOCATION/ROOT.war"
           scp -i $LOCAL_WAR_DIR/$WAR_FILE $TOMCAT_CREDS_USR@$TOMCAT_SERVER:$ROOT_WAR_LOCATION/ROOT.war
