@@ -2,47 +2,40 @@ pipeline {
   agent any
   options {
     buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '3')
-  }    
+  }
   environment {
     TOMCAT_SERVER="172.31.72.160"
     ROOT_WAR_LOCATION="C:\\path\\to\\tomcat\\webapps"
-    LOCAL_WAR_DIR="build\\dist"
+    LOCAL_WAR_DIR="target"
     WAR_FILE="cookingRecipesSpringRest-1.0-SNAPSHOT.war"
+    MAVEN_OPTS="-Dmaven.repo.local=/root/.m2/repository"
   }
   stages {
     stage('verify tooling') {
       steps {
-        bat '''
-          java -version
-          bld.bat version
-        '''
+        bat 'java -version'
       }
     }
     stage('download') {
       steps {
-        bat 'bld.bat download purge'
+        bat 'mvn clean'
       }
     }
     stage('compile') {
       steps {
-        bat 'bld.bat clean compile'
-      }
-    }
-    stage('precompile') {
-      steps {
-        bat 'bld.bat precompile'
+        bat 'mvn compile'
       }
     }
     stage('test') {
       steps {
-        bat 'bld.bat test'
+        bat 'mvn test'
       }
     }
-    stage('war') {
+    stage('package') {
       steps {
-        bat 'bld.bat war'
+        bat 'mvn package'
       }
-    }  
+    }
     stage('copy the war file to the Tomcat server') {
       steps {
         bat '''
