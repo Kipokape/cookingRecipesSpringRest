@@ -8,6 +8,7 @@ pipeline {
     ROOT_WAR_LOCATION="C:\\path\\to\\tomcat\\webapps"
     LOCAL_WAR_DIR="target"
     WAR_FILE="cookingRecipesSpringRest-1.0-SNAPSHOT.war"
+    MAVEN_CMD="C:\\apache-maven-3.8.6\\bin\\mvn.cmd"
     MAVEN_OPTS="-Dmaven.repo.local=/root/.m2/repository"
   }
   stages {
@@ -18,22 +19,22 @@ pipeline {
     }
     stage('download') {
       steps {
-        bat 'mvn clean'
+        bat '%MAVEN_CMD% clean'
       }
     }
     stage('compile') {
       steps {
-        bat 'mvn compile'
+        bat '%MAVEN_CMD% compile'
       }
     }
     stage('test') {
       steps {
-        bat 'mvn test'
+        bat '%MAVEN_CMD% test'
       }
     }
     stage('package') {
       steps {
-        bat 'mvn package'
+        bat '%MAVEN_CMD% package'
       }
     }
     stage('copy the war file to the Tomcat server') {
