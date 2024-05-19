@@ -1,10 +1,5 @@
 pipeline {
-  agent {
-        docker {
-            image 'node'
-            args '-u root'
-        }
-  }
+  agent any
   options {
     buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '3')
   }    
@@ -17,7 +12,7 @@ pipeline {
   stages {
     stage('verify tooling') {
       steps {
-        sh '''
+        bat '''
           java -version
           ./bld version
         '''
@@ -25,37 +20,37 @@ pipeline {
     }
     stage('download') {
       steps {
-        sh './bld download purge'
+        bat './bld download purge'
       }
     }
     stage('compile') {
       steps {
-        sh './bld clean compile'
+        bat './bld clean compile'
       }
     }
     stage('precompile') {
       steps {
-        sh './bld precompile'
+        bat './bld precompile'
       }
     }
     stage('test') {
       steps {
-        sh './bld test'
+        bat './bld test'
       }
     }
     stage('war') {
       steps {
-        sh './bld war'
+        bat './bld war'
       }
     }  
     stage('copy the war file to the Tomcat server') {
       steps {
-        sh '''
-          ssh -i $TOMCAT_CREDS_USR@$TOMCAT_SERVER "/home/pi/tools/apache-tomcat-10.1.18/bin/catalina.bat stop"
-          ssh -i $TOMCAT_CREDS_USR@$TOMCAT_SERVER "rm -rf $ROOT_WAR_LOCATION/ROOT; rm -f $ROOT_WAR_LOCATION/ROOT.war"
-          scp -i $LOCAL_WAR_DIR/$WAR_FILE $TOMCAT_CREDS_USR@$TOMCAT_SERVER:$ROOT_WAR_LOCATION/ROOT.war
-          ssh -i $TOMCAT_CREDS_USR@$TOMCAT_SERVER "chown $TOMCAT_CREDS_USR:$TOMCAT_CREDS_USR $ROOT_WAR_LOCATION/ROOT.war"
-          ssh -i $TOMCAT_CREDS_USR@$TOMCAT_SERVER "/home/pi/tools/apache-tomcat-10.1.18/bin/catalina.bat start"
+        bat '''
+          psexec \\\\$TOMCAT_SERVER -u $TOMCAT_CREDS_USR -p $TOMCAT_CREDS_PSWD "C:\\path\\to\\tomcat\\bin\\catalina.bat stop"
+          psexec \\\\$TOMCAT_SERVER -u $TOMCAT_CREDS_USR -p $TOMCAT_CREDS_PSWD "cmd /c del $ROOT_WAR_LOCATION\\ROOT /Q"
+          psexec \\\\$TOMCAT_SERVER -u $TOMCAT_CREDS_USR -p $TOMCAT_CREDS_PSWD "cmd /c del $ROOT_WAR_LOCATION\\ROOT.war /Q"
+          copy $LOCAL_WAR_DIR\\$WAR_FILE \\\\$TOMCAT_SERVER\\$ROOT_WAR_LOCATION\\ROOT.war
+          psexec \\\\$TOMCAT_SERVER -u $TOMCAT_CREDS_USR -p $TOMCAT_CREDS_PSWD "C:\\path\\to\\tomcat\\bin\\catalina.bat start"
         '''
       }
     }
