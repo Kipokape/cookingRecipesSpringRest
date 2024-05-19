@@ -5,8 +5,8 @@ pipeline {
   }    
   environment {
     TOMCAT_SERVER="172.31.72.160"
-    ROOT_WAR_LOCATION="/opt/tomcat/webapps"
-    LOCAL_WAR_DIR="build/dist"
+    ROOT_WAR_LOCATION="C:\\path\\to\\tomcat\\webapps"
+    LOCAL_WAR_DIR="build\\dist"
     WAR_FILE="cookingRecipesSpringRest-1.0-SNAPSHOT.war"
   }
   stages {
@@ -14,33 +14,33 @@ pipeline {
       steps {
         bat '''
           java -version
-          ./bld version
+          bld.bat version
         '''
       }
     }
     stage('download') {
       steps {
-        bat './bld download purge'
+        bat 'bld.bat download purge'
       }
     }
     stage('compile') {
       steps {
-        bat './bld clean compile'
+        bat 'bld.bat clean compile'
       }
     }
     stage('precompile') {
       steps {
-        bat './bld precompile'
+        bat 'bld.bat precompile'
       }
     }
     stage('test') {
       steps {
-        bat './bld test'
+        bat 'bld.bat test'
       }
     }
     stage('war') {
       steps {
-        bat './bld war'
+        bat 'bld.bat war'
       }
     }  
     stage('copy the war file to the Tomcat server') {
